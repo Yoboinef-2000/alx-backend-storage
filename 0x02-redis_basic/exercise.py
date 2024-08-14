@@ -7,6 +7,7 @@ if that was not obvious.
 import redis
 from typing import Union, Callable
 import uuid
+from functools import wraps
 
 
 class Cache:
@@ -44,3 +45,16 @@ class Cache:
     def get_int(self, key: str) -> int:
         """Int value getter method."""
         return self.get(key, lambda x: int(x))
+
+
+def count_calls(method: Callable) -> Callable:
+    """
+    This method counts how many times methods of the
+    Cache class are called.
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+
+    return wrapper
