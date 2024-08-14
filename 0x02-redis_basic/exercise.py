@@ -5,7 +5,7 @@ This module creates a Cache class,
 if that was not obvious.
 """
 import redis
-from typing import Union, Callable
+from typing import Union, Callable, Any
 import uuid
 from functools import wraps
 
@@ -53,7 +53,8 @@ def count_calls(method: Callable) -> Callable:
     Cache class are called.
     """
     @wraps(method)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self, *args, **kwargs) -> Any:
+        """Increment the call count."""
         self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
 
